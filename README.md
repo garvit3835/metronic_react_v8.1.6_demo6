@@ -13,5 +13,5 @@
 - Stay tuned for updates via [Twitter](//www.twitter.com/keenthemes) and [Instagram](//www.instagram.com/keenthemes) and
   check our marketplace for more amazing products: [Keenthemes Marketplace](//keenthemes.com/)
 
-Happy coding with Metronic! hi
+Happy coding with Metronic!
 

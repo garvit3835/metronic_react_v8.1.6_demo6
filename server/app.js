@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 // readdb()
 
 app.get("/api/employees", async(req, res) => {
-	// console.log("hi")
+	// console.log("helo")
 	await readdb().then((info) => res.json(info));
 });
 
