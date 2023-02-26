@@ -37,8 +37,8 @@ export default function Form({list, setList}) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data),
     })
-      .then(async(response) => await response.json())
-      .then(async(info) => await setList(info))
+      .then(async (response) => await response.json())
+      .then(async (info) => await setList(info))
       .catch((error) => console.log(error))
   }
 
@@ -62,6 +62,7 @@ export default function Form({list, setList}) {
           placeholder='Enter name'
           onChange={(e) => setName(e.target.value)}
           required
+          className='form-control w-25 d-inline m-5 mx-10'
         />
         <input
           type='number'
@@ -69,44 +70,51 @@ export default function Form({list, setList}) {
           onChange={(e) => setAge(e.target.value)}
           min='10'
           required
+          className='form-control w-25 d-inline m-5 mx-10'
         />
         <input
           type='email'
           placeholder='Enter email'
           onChange={(e) => setEmail(e.target.value)}
           required
+          className='form-control w-25 d-inline m-5 mx-10'
         />
         <input
           type='number'
           placeholder='Enter salary'
           onChange={(e) => setSalary(e.target.value)}
           required
+          className='form-control w-25 d-inline m-5 mx-10'
         />
 
-        <select onChange={handleCountry} defaultValue='' required>
+        <select onChange={handleCountry} defaultValue='' required className='form-control w-25 d-inline m-5 mx-10'>
           <option value='' label='Select Country' disabled />
           {countries.map((country, i) => {
             return (
-              <option key={i} value={`${country.name}%${country.isoCode}`} label={country.name} />
+              <option
+                key={i}
+                value={`${country.name}%${country.isoCode}`}
+                label={country.name}
+              />
             )
           })}
         </select>
 
-        <select onChange={handleState} defaultValue='' required>
+        <select onChange={handleState} defaultValue='' className='form-control w-25 d-inline m-5 mx-10'>
           <option value='' label='Select State' disabled />
           {states.map((state, i) => {
             return <option key={i} value={`${state.name}%${state.isoCode}`} label={state.name} />
           })}
         </select>
 
-        <select onChange={(e) => setCity(e.target.value)} defaultValue='' required>
+        <select onChange={(e) => setCity(e.target.value)} defaultValue='' className='form-control w-25 d-inline m-5 mx-10'>
           <option value='' label='Select City' disabled />
           {cities.map((city, i) => {
             return <option key={i} value={city.name} label={city.name} />
           })}
         </select>
 
-        <button type='submit' className='btn btn-primary btn-sm py-1'>
+        <button type='submit' className='btn btn-primary form-control w-25 d-inline m-5 mx-10'>
           Submit
         </button>
       </form>

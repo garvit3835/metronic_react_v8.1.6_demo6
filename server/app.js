@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 // readdb()
 
 app.get("/api/employees", async(req, res) => {
-	console.log("hi")
+	// console.log("hi")
 	await readdb().then((info) => res.json(info));
 });
 
@@ -28,10 +28,9 @@ app.post("/api/employees/insert", async(req, res) => {
 	.then(readdb().then((info) => res.json(info)))
 });
 
-app.delete("/api/employees/delete", async(req, res) => {
-	console.log("hi")
-	console.log(req.body);
-	await deletedb(req.body.id)
+app.delete("/api/employees/delete/:id", async(req, res) => {
+	console.log(req.params.id);
+	await deletedb(req.params.id)
 	.then(readdb().then((info) => res.json(info)))
 });
 

@@ -1,49 +1,23 @@
 import React, {useState, useEffect} from 'react'
-// import Form from "./form";
 import Update from './update'
+import axios from 'axios'
 
 export default function List({list, setList}) {
   //   const [list, setList] = useState()
-  const [update, setUpdate] = useState('soduhgfs')
+  const [update, setUpdate] = useState('hello')
   //   const [count, setCount] = useState(0)
 
   const handleDelete = async (id) => {
-    let data = {
-      id: id,
-    }
-    console.log(data)
-    const res = await fetch('http://localhost:5000/api/employees/delete', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then(async(response) => await response.json())
-      .then(async(info) => await setList(info))
+    await axios.delete(`http://localhost:5000/api/employees/delete/${id}`)
+      .then(async (res) => await setList(res.data))
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch(
-        'http://localhost:5000/api/employees',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-        []
-      )
-
-      const data = await res.json()
-      console.log('hello')
-      await setList(data)
-    }
-
-    fetchData()
+    axios.get('http://localhost:5000/api/employees')
+    .then(async (res) => await setList(res.data))
   }, [])
 
+  console.log(list)
   return (
     <>
       <table className='table table-sm'>
