@@ -37,8 +37,8 @@ export default function Form({list, setList}) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
-      .then((info) => setList(info))
+      .then(async(response) => await response.json())
+      .then(async(info) => await setList(info))
       .catch((error) => console.log(error))
   }
 

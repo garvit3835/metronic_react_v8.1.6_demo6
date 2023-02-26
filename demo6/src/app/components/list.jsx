@@ -19,8 +19,8 @@ export default function List({list, setList}) {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
-      .then((info) => setList(info))
+      .then(async(response) => await response.json())
+      .then(async(info) => await setList(info))
   }
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function List({list, setList}) {
 
       const data = await res.json()
       console.log('hello')
-      setList(data)
+      await setList(data)
     }
 
     fetchData()

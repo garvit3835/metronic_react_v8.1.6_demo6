@@ -17,28 +17,28 @@ app.get("/", (req, res) => {
 
 // readdb()
 
-app.get("/api/employees", (req, res) => {
+app.get("/api/employees", async(req, res) => {
 	console.log("hi")
-	readdb().then((info) => res.json(info));
+	await readdb().then((info) => res.json(info));
 });
 
-app.post("/api/employees/insert", (req, res) => {
+app.post("/api/employees/insert", async(req, res) => {
 	const { name, age, email, salary, country, state, city } = req.body;
-	insertdb(name, age, email, salary, country, state, city)
+	await insertdb(name, age, email, salary, country, state, city)
 	.then(readdb().then((info) => res.json(info)))
 });
 
-app.delete("/api/employees/delete", (req, res) => {
+app.delete("/api/employees/delete", async(req, res) => {
 	console.log("hi")
 	console.log(req.body);
-	deletedb(req.body.id)
+	await deletedb(req.body.id)
 	.then(readdb().then((info) => res.json(info)))
 });
 
-app.put("/api/employees/put", (req, res) => {
+app.put("/api/employees/put", async (req, res) => {
 	console.log(req.body);
 	const { id, name, age, email, salary, country, state, city } = req.body;
-	updatedb(id, name, age, email, salary, country, state, city)
+	await updatedb(id, name, age, email, salary, country, state, city)
 	.then(readdb().then((info) => res.json(info)))
 });
 
