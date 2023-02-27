@@ -23,6 +23,9 @@ export default function Form({list, setList}) {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    const submit = document.getElementById("submit")
+    submit.innerText = "Submitting..."
+    submit.disabled = true
     let data = {
       name: name,
       age: age,
@@ -37,9 +40,12 @@ export default function Form({list, setList}) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data),
     })
-      .then(async (response) => await response.json())
-      .then(async (info) => await setList(info))
+      .then((res) => res.json())
+      .then((info) => setList(info))
       .catch((error) => console.log(error))
+    
+    submit.disabled = false
+    submit.innerText = "Submit"
   }
 
   const handleCountry = async (event) => {
@@ -114,7 +120,7 @@ export default function Form({list, setList}) {
           })}
         </select>
 
-        <button type='submit' className='btn btn-primary form-control w-25 d-inline m-5 mx-10'>
+        <button type='submit' id='submit' className='btn btn-primary form-control w-25 d-inline m-5 mx-10'>
           Submit
         </button>
       </form>

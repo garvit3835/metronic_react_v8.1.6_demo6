@@ -1,21 +1,74 @@
 import React, {useState, useEffect} from 'react'
-import Update from './update'
+import {Country, State, City} from 'country-state-city'
 import axios from 'axios'
 
 export default function List({list, setList}) {
-  //   const [list, setList] = useState()
-  const [update, setUpdate] = useState('hello')
-  //   const [count, setCount] = useState(0)
-
+  const [employeeId, setEmployeeId] = useState()
+  const [name, setName] = useState('')
+  const [age, setAge] = useState()
+  const [email, setEmail] = useState('')
+  const [salary, setSalary] = useState()
+  const [country, setCountry] = useState('')
+  const [countryId, setCountryId] = useState()
+  const [stateId, setStateId] = useState()
+  const [state, setState] = useState('')
+  const [city, setCity] = useState('')
+  const countries = Country.getAllCountries()
+  let states = []
+  if (countryId) {
+    states = State.getStatesOfCountry(countryId)
+  }
+  let cities = []
+  if (stateId) {
+    cities = City.getCitiesOfState(countryId, stateId)
+  }
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/employees/delete/${id}`)
-      .then(async (res) => await setList(res.data))
+    const deleteBtn = document.getElementById('delete')
+    deleteBtn.innerHTML = 'Deleting...'
+    deleteBtn.disabled = true
+    await axios
+      .delete(`http://localhost:5000/api/employees/delete/${id}`)
+      .then((res) => setList(res.data))
+    deleteBtn.innerHTML = 'Delete'
+    deleteBtn.disabled = false
   }
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/employees')
-    .then(async (res) => await setList(res.data))
+    axios.get('http://localhost:5000/api/employees').then((res) => setList(res.data))
   }, [])
+
+  const handleUpdate = async () => {
+    const update = document.getElementById("update")
+    update.innerText = "Updating..."
+    update.disabled = true
+    const data = {
+      id: employeeId,
+      name: name,
+      age: age,
+      email: email,
+      salary: salary,
+      country: country,
+      state: state,
+      city: city,
+    }
+    const res = await axios.put('http://localhost:5000/api/employees/put', data)
+    await setList(res.data)
+
+    update.disabled = false
+    update.innerText = "Confirm Update"
+  }
+
+  const handleCountry = async (event) => {
+    const countryData = await event.target.value.split('%')
+    setCountry(countryData[0])
+    setCountryId(countryData[1])
+  }
+
+  const handleState = async (event) => {
+    const stateData = await event.target.value.split('%')
+    setState(stateData[0])
+    setStateId(stateData[1])
+  }
 
   console.log(list)
   return (
@@ -52,34 +105,144 @@ export default function List({list, setList}) {
         {/* <br /> */}
         <tbody>
           {list &&
-            list.map((employee, i) => (
-              <tr key={i}>
-                <th className='fs-3'>{i + 1}</th>
-                <td className='fs-3'>{employee.name}</td>
-                <td className='fs-3'>{employee.age}</td>
-                <td className='fs-3'>{employee.email}</td>
-                <td className='fs-3'>{employee.salary}</td>
-                <td className='fs-3'>{employee.country}</td>
-                <td className='fs-3'>{employee.state}</td>
-                <td className='fs-3'>{employee.city}</td>
+            list.map((employee, i) => {
+              return (
+                <>
+                  <tr key={i}>
+                    <th className='fs-3'>{i + 1}</th>
+                    <td className='fs-3'>{employee.name}</td>
+                    <td className='fs-3'>{employee.age}</td>
+                    <td className='fs-3'>{employee.email}</td>
+                    <td className='fs-3'>{employee.salary}</td>
+                    <td className='fs-3'>{employee.country}</td>
+                    <td className='fs-3'>{employee.state}</td>
+                    <td className='fs-3'>{employee.city}</td>
 
-                <td
-                  onClick={() => {
-                    setUpdate('hello')
-                  }}
-                >
-                  <button type='button' className='btn btn-primary btn-sm py-1'>
-                    Update
-                  </button>
-                </td>
+                    <td
+                      onClick={() => {
+                        setEmployeeId(employee._id)
+                      }}
+                    >
+                      <button type='button' className='btn btn-primary btn-sm py-1'>
+                        Update
+                      </button>
+                    </td>
 
-                <td onClick={() => handleDelete(employee._id)}>
-                  <button type='button' className='btn btn-danger btn-sm py-1'>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <td onClick={() => handleDelete(employee._id)}>
+                      <button type='button' id='delete' className='btn btn-danger btn-sm py-1'>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                  {/* <form> */}
+                  {employeeId === employee._id ? (
+                    <tr key={-i}>
+                      <th className='fs-3'></th>
+
+                      <td className='fs-4'>
+                        <input
+                          type='text'
+                          placeholder='Enter name'
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                          className='w-100'
+                        />
+                      </td>
+                      <td className='fs-4'>
+                        <input
+                          type='number'
+                          placeholder='Enter age'
+                          onChange={(e) => setAge(e.target.value)}
+                          min='10'
+                          required
+                          className='w-100'
+                        />
+                      </td>
+                      <td className='fs-4'>
+                        <input
+                          type='email'
+                          placeholder='Enter email'
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          className='w-100'
+                        />
+                      </td>
+                      <td className='fs-4'>
+                        <input
+                          type='number'
+                          placeholder='Enter salary'
+                          onChange={(e) => setSalary(e.target.value)}
+                          required
+                          className='w-100'
+                        />
+                      </td>
+                      <td className='fs-4'>
+                        <select
+                          onChange={handleCountry}
+                          defaultValue=''
+                          required
+                          className='w-100'
+                        >
+                          <option value='' label='Select Country' disabled />
+                          {countries.map((country, i) => {
+                            return (
+                              <option
+                                key={i}
+                                value={`${country.name}%${country.isoCode}`}
+                                label={country.name}
+                              />
+                            )
+                          })}
+                        </select>
+                      </td>
+                      <td className='fs-4'>
+                        <select
+                          onChange={handleState}
+                          defaultValue=''
+                          className='w-100'
+                        >
+                          <option value='' label='Select State' disabled />
+                          {states.map((state, i) => {
+                            return (
+                              <option
+                                key={i}
+                                value={`${state.name}%${state.isoCode}`}
+                                label={state.name}
+                              />
+                            )
+                          })}
+                        </select>
+                      </td>
+                      <td className='fs-4'>
+                        <select
+                          onChange={(e) => setCity(e.target.value)}
+                          defaultValue=''
+                          className='w-100'
+                        >
+                          <option value='' label='Select City' disabled />
+                          {cities.map((city, i) => {
+                            return <option key={i} value={city.name} label={city.name} />
+                          })}
+                        </select>
+                      </td>
+                      <td colspan='2'>
+                        <button
+                          id='update'
+                          type='submit'
+                          className='btn btn-primary btn-sm py-2'
+                          onClick={handleUpdate}
+                        >
+                          Confirm Update
+                        </button>
+                      </td>
+                    </tr>
+                  ) : (
+                    ''
+                  )}
+                  {/* </form> */}
+                </>
+              )
+            })}
         </tbody>
       </table>
     </>
