@@ -17,31 +17,47 @@ app.get("/", (req, res) => {
 
 // readdb()
 
-app.get("/api/employees", async(req, res) => {
-	const data = await readdb()
-	res.json(data)
+app.get("/api/employees", async (req, res) => {
+	const data = await readdb();
+	res.json(data);
 });
 
-app.post("/api/employees/insert", async(req, res) => {
+app.post("/api/employees/insert", async (req, res) => {
 	const { name, age, email, salary, country, state, city } = req.body;
-	await insertdb(name, age, email, salary, country, state, city)
-	const data = await readdb()
-	res.json(data)
+	const insert = await insertdb(name, age, email, salary, country, state, city);
+	if (insert) {
+		const data = await readdb();
+		res.json(data);
+	} else {
+		res.json();
+	}
 });
 
-app.delete("/api/employees/delete/:id", async(req, res) => {
+app.delete("/api/employees/delete/:id", async (req, res) => {
 	console.log(req.params.id);
-	await deletedb(req.params.id)
-	const data = await readdb()
-	res.json(data)
+	await deletedb(req.params.id);
+	const data = await readdb();
+	res.json(data);
 });
 
 app.put("/api/employees/put", async (req, res) => {
-	console.log(req.body);
 	const { id, name, age, email, salary, country, state, city } = req.body;
-	await updatedb(id, name, age, email, salary, country, state, city)
-	const data = await readdb()
-	res.json(data)
+	const update = await updatedb(
+		id,
+		name,
+		age,
+		email,
+		salary,
+		country,
+		state,
+		city
+	);
+	if (update) {
+		const data = await readdb();
+		res.json(data);
+	} else {
+		res.json();
+	}
 });
 
 app.listen(port, () => {

@@ -1,7 +1,8 @@
 import React, {useState} from 'react'
 import {Country, State, City} from 'country-state-city'
+import axios from 'axios'
 
-export default function Form({list, setList}) {
+export default function Form({setList}) {
   const [name, setName] = useState('')
   const [age, setAge] = useState()
   const [email, setEmail] = useState('')
@@ -23,8 +24,8 @@ export default function Form({list, setList}) {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const submit = document.getElementById("submit")
-    submit.innerText = "Submitting..."
+    const submit = document.getElementById('submit')
+    submit.innerText = 'Submitting...'
     submit.disabled = true
     let data = {
       name: name,
@@ -35,17 +36,15 @@ export default function Form({list, setList}) {
       state: state,
       city: city,
     }
-    await fetch('http://localhost:5000/api/employees/insert', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((info) => setList(info))
-      .catch((error) => console.log(error))
-    
+    const res = await axios.post('http://localhost:5000/api/employees/insert', data)
+    if (res.data) {
+      await setList(res.data)
+    } else {
+      alert('Employee with this Email already exist')
+    }
+
     submit.disabled = false
-    submit.innerText = "Submit"
+    submit.innerText = 'Submit'
   }
 
   const handleCountry = async (event) => {
@@ -93,34 +92,47 @@ export default function Form({list, setList}) {
           className='form-control w-25 d-inline m-5 mx-10'
         />
 
-        <select onChange={handleCountry} defaultValue='' required className='form-control w-25 d-inline m-5 mx-10'>
+        <select
+          onChange={handleCountry}
+          defaultValue=''
+          required
+          className='form-control w-25 d-inline m-5 mx-10'
+        >
           <option value='' label='Select Country' disabled />
           {countries.map((country, i) => {
             return (
-              <option
-                key={i}
-                value={`${country.name}%${country.isoCode}`}
-                label={country.name}
-              />
+              <option key={i} value={`${country.name}%${country.isoCode}`} label={country.name} />
             )
           })}
         </select>
 
-        <select onChange={handleState} defaultValue='' className='form-control w-25 d-inline m-5 mx-10'>
+        <select
+          onChange={handleState}
+          defaultValue=''
+          className='form-control w-25 d-inline m-5 mx-10'
+        >
           <option value='' label='Select State' disabled />
           {states.map((state, i) => {
             return <option key={i} value={`${state.name}%${state.isoCode}`} label={state.name} />
           })}
         </select>
 
-        <select onChange={(e) => setCity(e.target.value)} defaultValue='' className='form-control w-25 d-inline m-5 mx-10'>
+        <select
+          onChange={(e) => setCity(e.target.value)}
+          defaultValue=''
+          className='form-control w-25 d-inline m-5 mx-10'
+        >
           <option value='' label='Select City' disabled />
           {cities.map((city, i) => {
             return <option key={i} value={city.name} label={city.name} />
           })}
         </select>
 
-        <button type='submit' id='submit' className='btn btn-primary form-control w-25 d-inline m-5 mx-10'>
+        <button
+          type='submit'
+          id='submit'
+          className='btn btn-primary form-control w-25 d-inline m-5 mx-10'
+        >
           Submit
         </button>
       </form>

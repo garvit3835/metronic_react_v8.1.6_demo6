@@ -1,7 +1,7 @@
 const connectdb = async () => {
 	require("dotenv").config();
-	const { MongoClient, ServerApiVersion, Collection } = require("mongodb");
-	const uri = process.env.DB_URI;
+	const { MongoClient, ServerApiVersion} = require("mongodb");
+	const uri = "mongodb+srv://abcd1234:new1234@cluster0.hpgfy3l.mongodb.net/?retryWrites=true&w=majority";
 	const client = new MongoClient(uri, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
@@ -14,6 +14,6 @@ const connectdb = async () => {
 	// console.log(hello)
 	return collection;
 };
-// connectdb()
+// connectdb();
 
 module.exports = connectdb;
