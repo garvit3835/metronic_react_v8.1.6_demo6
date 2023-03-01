@@ -81,9 +81,9 @@ export default function List({list, setList}) {
         <table className='table table-sm'>
           <thead>
             <tr>
-              <td scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold'>
                 #
-              </td>
+              </th>
               <th scope='col' className='fs-3 fw-bold'>
                 Name
               </th>
@@ -108,13 +108,12 @@ export default function List({list, setList}) {
             </tr>
           </thead>
           {/* <br /> */}
-          <tbody>
+          {/* <tbody> */}
             {list &&
               list.map((employee, i) => {
-                return (
-                  <>
-                    <tr key={i}>
-                      <th className='fs-3'>{i + 1}</th>
+                return <tbody key={i}>
+                <tr>
+                      <td className='fs-3'>{i + 1}</td>
                       <td className='fs-3'>{employee.name}</td>
                       <td className='fs-3'>{employee.age}</td>
                       <td className='fs-3'>{employee.email}</td>
@@ -242,7 +241,7 @@ export default function List({list, setList}) {
                             })}
                           </select>
                         </td>
-                        <td colspan='2'>
+                        <td colSpan='2'>
                           <button
                             id='update'
                             type='submit'
@@ -257,10 +256,10 @@ export default function List({list, setList}) {
                     ) : (
                       ''
                     )}
-                  </>
-                )
+                  </tbody>
+                // )
               })}
-          </tbody>
+          {/* </tbody> */}
         </table>
       </form>
     </>
