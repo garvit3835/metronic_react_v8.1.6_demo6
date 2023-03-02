@@ -34,7 +34,6 @@ app.post("/api/employees/insert", async (req, res) => {
 });
 
 app.delete("/api/employees/delete/:id", async (req, res) => {
-	console.log(req.params.id);
 	await deletedb(req.params.id);
 	const data = await readdb();
 	res.json(data);

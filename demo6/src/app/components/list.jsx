@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import {Country, State, City} from 'country-state-city'
 import axios from 'axios'
+import {ToastContainer, toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function List({list, setList}) {
   const [employeeId, setEmployeeId] = useState()
@@ -56,7 +58,16 @@ export default function List({list, setList}) {
     if (res.data) {
       await setList(res.data)
     } else {
-      alert('Employee with this Email already exist')
+      toast.error('Enter a unique Email', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      })
     }
 
     update.disabled = false
@@ -262,6 +273,18 @@ export default function List({list, setList}) {
           {/* </tbody> */}
         </table>
       </form>
+      <ToastContainer
+        position='top-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='colored'
+      />
     </>
   )
 }

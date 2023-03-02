@@ -1,6 +1,8 @@
 import React, {useState} from 'react'
 import {Country, State, City} from 'country-state-city'
 import axios from 'axios'
+import {ToastContainer, toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function Form({setList}) {
   const [name, setName] = useState('')
@@ -40,7 +42,16 @@ export default function Form({setList}) {
     if (res.data) {
       await setList(res.data)
     } else {
-      alert('Employee with this Email already exist')
+      toast.error('Enter a unique Email', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      })
     }
 
     submit.disabled = false
@@ -136,6 +147,18 @@ export default function Form({setList}) {
           Submit
         </button>
       </form>
+      <ToastContainer
+        position='top-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='colored'
+      />
     </div>
   )
 }
