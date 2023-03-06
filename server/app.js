@@ -5,6 +5,7 @@ const updatedb = require("./db/update");
 const readdb = require("./db/read");
 const insertdb = require("./db/insert");
 const deletedb = require("./db/delete");
+// const connectdb = require('./db/connect')
 const cors = require("cors");
 
 app.use(cors());
@@ -17,9 +18,11 @@ app.get("/", (req, res) => {
 
 // readdb()
 
-app.get("/api/employees", async (req, res) => {
-	const data = await readdb();
+
+app.get("/api/employees/:page", async (req, res) => {
+	const data = await readdb(req.params.page);
 	res.json(data);
+	// console.log(data)
 });
 
 app.post("/api/employees/insert", async (req, res) => {

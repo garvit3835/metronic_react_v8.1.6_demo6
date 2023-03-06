@@ -15,6 +15,7 @@ export default function List({list, setList}) {
   const [stateId, setStateId] = useState('')
   const [state, setState] = useState('')
   const [city, setCity] = useState('')
+  const [page, setPage] = useState(0)
   const countries = Country.getAllCountries()
   let states = []
   if (countryId) {
@@ -36,8 +37,24 @@ export default function List({list, setList}) {
   }
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/employees').then((res) => setList(res.data))
-  }, [])
+    axios.get(`http://localhost:5000/api/employees/${page}`).then((res) => {
+      const nextPage = document.getElementById('nextPage')
+      setList(res.data)
+      if (res.data.length < 3) {
+        nextPage.disabled = true
+      } else {
+        nextPage.disabled = false
+      }
+    })
+    const prevPage = document.getElementById('prevPage')
+    if (page === 0) {
+      prevPage.disabled = true
+    } else {
+      prevPage.disabled = false
+    }
+
+    // .catch((document.getElementById('nextPage').disabled = true))
+  }, [page])
 
   const handleUpdate = async (event) => {
     event.preventDefault()
@@ -121,6 +138,7 @@ export default function List({list, setList}) {
           </thead>
           {/* <br /> */}
           {/* <tbody> */}
+
           {list &&
             list.map((employee, i) => {
               return (
@@ -286,6 +304,22 @@ export default function List({list, setList}) {
           {/* </tbody> */}
         </table>
       </form>
+      <div>
+        <button
+          id='prevPage'
+          onClick={() => setPage(page - 1)}
+          className='btn btn-primary btn-sm py-1 m-2'
+        >
+          Previous Page
+        </button>
+        <button
+          id='nextPage'
+          onClick={() => setPage(page + 1)}
+          className='btn btn-primary btn-sm py-1 m-2'
+        >
+          Next Page
+        </button>
+      </div>
       <ToastContainer
         position='top-right'
         autoClose={3000}
