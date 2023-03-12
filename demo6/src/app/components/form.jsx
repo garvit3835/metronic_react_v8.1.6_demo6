@@ -4,7 +4,7 @@ import axios from 'axios'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-export default function Form({setList}) {
+export default function Form({setList, page, setNextbtn}) {
   const [name, setName] = useState('')
   const [age, setAge] = useState()
   const [email, setEmail] = useState('')
@@ -38,9 +38,12 @@ export default function Form({setList}) {
       state: state,
       city: city,
     }
-    const res = await axios.post('http://localhost:5000/api/employees/insert', data)
+    const res = await axios.post(`http://localhost:5000/api/employees/insert/${page}`, data)
     if (res.data) {
       await setList(res.data)
+      if (res.data.length >= 3) {
+        setNextbtn(true)
+      }
     } else {
       toast.error('Enter a unique Email', {
         position: 'top-right',

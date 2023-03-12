@@ -4,7 +4,7 @@ import axios from 'axios'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-export default function List({list, setList}) {
+export default function List({list, setList, page, setPage, nextbtn}) {
   const [employeeId, setEmployeeId] = useState()
   const [name, setName] = useState('')
   const [age, setAge] = useState()
@@ -15,7 +15,9 @@ export default function List({list, setList}) {
   const [stateId, setStateId] = useState('')
   const [state, setState] = useState('')
   const [city, setCity] = useState('')
-  const [page, setPage] = useState(0)
+  const [search, setSearch] = useState('')
+  // let newList = []
+
   const countries = Country.getAllCountries()
   let states = []
   if (countryId) {
@@ -25,13 +27,35 @@ export default function List({list, setList}) {
   if (stateId) {
     cities = City.getCitiesOfState(countryId, stateId)
   }
+
+  useEffect(() => {
+    if (nextbtn) {
+      const nextPage = document.getElementById('nextPage')
+      nextPage.disabled = false
+    }
+  }, [nextbtn])
+
+  // useEffect(() => {
+  // newList = [...list].sort((a, b) => (a.age < b.age ? -1 : 1))
+  // }, [list])
+
+  // newList = [...list].sort((a, b) => (a.age < b.age ? -1 : 1))
+  // newList && setList(newList)
+  // setList(newList)
+
   const handleDelete = async (id) => {
     const deleteBtn = document.getElementById(id)
     deleteBtn.innerHTML = 'Deleting...'
     deleteBtn.disabled = true
-    await axios
-      .delete(`http://localhost:5000/api/employees/delete/${id}`)
-      .then((res) => setList(res.data))
+    await axios.delete(`http://localhost:5000/api/employees/delete/${id}/${page}`).then((res) => {
+      const nextPage = document.getElementById('nextPage')
+      setList(res.data)
+      if (res.data.length < 3) {
+        nextPage.disabled = true
+      } else {
+        nextPage.disabled = false
+      }
+    })
     deleteBtn.innerHTML = 'Delete'
     deleteBtn.disabled = false
   }
@@ -56,6 +80,20 @@ export default function List({list, setList}) {
     // .catch((document.getElementById('nextPage').disabled = true))
   }, [page])
 
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/employees/search/${search}`)
+      .then((res) => setList(res.data))
+      .then(() => {
+        if (search) {
+          const nextPage = document.getElementById('nextPage')
+          const prevPage = document.getElementById('prevPage')
+          nextPage.disabled = true
+          prevPage.disabled = true
+        }
+      })
+  }, [search])
+
   const handleUpdate = async (event) => {
     event.preventDefault()
     const update = document.getElementById('update')
@@ -71,7 +109,7 @@ export default function List({list, setList}) {
       state: state,
       city: city,
     }
-    const res = await axios.put('http://localhost:5000/api/employees/put', data)
+    const res = await axios.put(`http://localhost:5000/api/employees/put/${page}`, data)
     if (res.data) {
       await setList(res.data)
     } else {
@@ -106,6 +144,13 @@ export default function List({list, setList}) {
 
   return (
     <>
+      <input
+        type='text'
+        placeholder='Search Employee'
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className='form-control d-inline m-5 w-50 mx-10'
+      />
       <form onSubmit={handleUpdate}>
         <table className='table table-sm'>
           <thead>
@@ -187,7 +232,7 @@ export default function List({list, setList}) {
                     </td>
                   </tr>
 
-                  {employeeId === employee._id ? (
+                  {employeeId === employee._id && (
                     <tr>
                       <th className='fs-3'></th>
 
@@ -294,8 +339,6 @@ export default function List({list, setList}) {
                         </button>
                       </td>
                     </tr>
-                  ) : (
-                    ''
                   )}
                 </tbody>
               )
