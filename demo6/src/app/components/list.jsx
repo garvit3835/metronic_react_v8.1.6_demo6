@@ -3,6 +3,7 @@ import {Country, State, City} from 'country-state-city'
 import axios from 'axios'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import {string} from 'yup'
 
 export default function List({list, setList, page, setPage, nextbtn}) {
   const [employeeId, setEmployeeId] = useState()
@@ -16,7 +17,7 @@ export default function List({list, setList, page, setPage, nextbtn}) {
   const [state, setState] = useState('')
   const [city, setCity] = useState('')
   const [search, setSearch] = useState('')
-  // let newList = []
+  const [sort, setSort] = useState('ascending')
 
   const countries = Country.getAllCountries()
   let states = []
@@ -34,14 +35,6 @@ export default function List({list, setList, page, setPage, nextbtn}) {
       nextPage.disabled = false
     }
   }, [nextbtn])
-
-  // useEffect(() => {
-  // newList = [...list].sort((a, b) => (a.age < b.age ? -1 : 1))
-  // }, [list])
-
-  // newList = [...list].sort((a, b) => (a.age < b.age ? -1 : 1))
-  // newList && setList(newList)
-  // setList(newList)
 
   const handleDelete = async (id) => {
     const deleteBtn = document.getElementById(id)
@@ -85,11 +78,14 @@ export default function List({list, setList, page, setPage, nextbtn}) {
       .get(`http://localhost:5000/api/employees/search/${search}`)
       .then((res) => setList(res.data))
       .then(() => {
+        const nextPage = document.getElementById('nextPage')
+        // const prevPage = document.getElementById('prevPage')
         if (search) {
-          const nextPage = document.getElementById('nextPage')
-          const prevPage = document.getElementById('prevPage')
           nextPage.disabled = true
-          prevPage.disabled = true
+          // prevPage.disabled = true
+        } else {
+          nextPage.disabled = false
+          // prevPage.disabled = false
         }
       })
   }, [search])
@@ -136,6 +132,42 @@ export default function List({list, setList, page, setPage, nextbtn}) {
     setCountryId(countryData[1])
   }
 
+  const sorting = (column) => {
+    if (sort === 'ascending') {
+      const sorted = [...list].sort((a, b) =>
+        a[column].toLowerCase() > b[column].toLowerCase() ? 1 : -1
+      )
+      setList(sorted)
+      setSort('descending')
+    }
+
+    if (sort === 'descending') {
+      const sorted = [...list].sort((a, b) =>
+        a[column].toLowerCase() < b[column].toLowerCase() ? 1 : -1
+      )
+      setList(sorted)
+      setSort('ascending')
+    }
+  }
+
+  const sortingNum = (column) => {
+    if (sort === 'ascending') {
+      const sorted = [...list].sort((a, b) =>
+        a[column] > b[column] ? 1 : -1
+      )
+      setList(sorted)
+      setSort('descending')
+    }
+
+    if (sort === 'descending') {
+      const sorted = [...list].sort((a, b) =>
+        a[column] < b[column] ? 1 : -1
+      )
+      setList(sorted)
+      setSort('ascending')
+    }
+  }
+
   const handleState = async (event) => {
     const stateData = await event.target.value.split('%')
     setState(stateData[0])
@@ -158,31 +190,29 @@ export default function List({list, setList, page, setPage, nextbtn}) {
               <th scope='col' className='fs-3 fw-bold'>
                 #
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sorting('name')}>
                 Name
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sortingNum('age')}>
                 Age
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sorting('email')}>
                 Email
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sortingNum('salary')}>
                 Salary
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sorting('country')}>
                 Country
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sorting('state')}>
                 State
               </th>
-              <th scope='col' className='fs-3 fw-bold'>
+              <th scope='col' className='fs-3 fw-bold' onClick={() => sorting('city')}>
                 City
               </th>
             </tr>
           </thead>
-          {/* <br /> */}
-          {/* <tbody> */}
 
           {list &&
             list.map((employee, i) => {
