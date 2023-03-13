@@ -29,11 +29,12 @@ export default function Form({setList, page, setNextbtn}) {
     const submit = document.getElementById('submit')
     submit.innerText = 'Submitting...'
     submit.disabled = true
+    console.log(typeof(age))
     let data = {
       name: name,
-      age: age,
+      age: parseInt(age),
       email: email,
-      salary: salary,
+      salary: parseInt(salary),
       country: country,
       state: state,
       city: city,
@@ -87,7 +88,7 @@ export default function Form({setList, page, setNextbtn}) {
           type='number'
           placeholder='Enter age'
           onChange={(e) => setAge(e.target.value)}
-          min='10'
+          min={10}
           required
           className='form-control w-25 d-inline m-5 mx-10'
         />

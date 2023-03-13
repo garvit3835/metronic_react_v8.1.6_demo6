@@ -33,6 +33,7 @@ app.get("/api/employees/search/:searchName", async (req, res) => {
 });
 
 app.post("/api/employees/insert/:page", async (req, res) => {
+	console.log(req.body)
 	const { name, age, email, salary, country, state, city } = req.body;
 	const insert = await insertdb(name, age, email, salary, country, state, city);
 	if (insert) {
