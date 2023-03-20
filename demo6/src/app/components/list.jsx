@@ -3,9 +3,8 @@ import {Country, State, City} from 'country-state-city'
 import axios from 'axios'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import {string} from 'yup'
 
-export default function List({list, setList, page, setPage, nextbtn}) {
+export default function List({list, setList, page, setPage, nextbtn, pageSize, setPageSize}) {
   const [employeeId, setEmployeeId] = useState()
   const [name, setName] = useState('')
   const [age, setAge] = useState()
@@ -38,23 +37,26 @@ export default function List({list, setList, page, setPage, nextbtn}) {
 
   const handleDelete = async (id) => {
     const deleteBtn = document.getElementById(id)
-    deleteBtn.innerHTML = 'Deleting...'
     deleteBtn.disabled = true
-    await axios.delete(`http://localhost:5000/api/employees/delete/${id}/${page}`).then((res) => {
-      const nextPage = document.getElementById('nextPage')
-      setList(res.data)
-      if (res.data.length < 3) {
-        nextPage.disabled = true
-      } else {
-        nextPage.disabled = false
-      }
-    })
-    deleteBtn.innerHTML = 'Delete'
+       // deleteBtn.textContent = 'Deleting...'
+    // console.log(deleteBtn)
+    axios
+      .delete(`http://localhost:5000/api/employees/delete/${id}/${page}/${parseInt(pageSize)}`)
+      .then((res) => {
+        const nextPage = document.getElementById('nextPage')
+        setList(res.data)
+        if (res.data.length < 3) {
+          nextPage.disabled = true
+        } else {
+          nextPage.disabled = false
+        }
+      })
+    // deleteBtn.textContent = 'Delete'
     deleteBtn.disabled = false
   }
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/employees/${page}`).then((res) => {
+    axios.get(`http://localhost:5000/api/employees/${page}/${parseInt(pageSize)}`).then((res) => {
       const nextPage = document.getElementById('nextPage')
       setList(res.data)
       if (res.data.length < 3) {
@@ -71,23 +73,37 @@ export default function List({list, setList, page, setPage, nextbtn}) {
     }
 
     // .catch((document.getElementById('nextPage').disabled = true))
-  }, [page])
+  }, [page, pageSize])
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/employees/search/${search}`)
-      .then((res) => setList(res.data))
-      .then(() => {
-        const nextPage = document.getElementById('nextPage')
-        // const prevPage = document.getElementById('prevPage')
-        if (search) {
+    const nextPage = document.getElementById('nextPage')
+    if (search) {
+      const data = {
+        search: search,
+      }
+      axios
+        .post(`http://localhost:5000/api/employees/search`, data)
+        .then((res) => setList(res.data))
+        .then(() => {
           nextPage.disabled = true
-          // prevPage.disabled = true
+        })
+    } else {
+      axios.get(`http://localhost:5000/api/employees/${page}/${parseInt(pageSize)}`).then((res) => {
+        const nextPage = document.getElementById('nextPage')
+        setList(res.data)
+        if (res.data.length < 3) {
+          nextPage.disabled = true
         } else {
           nextPage.disabled = false
-          // prevPage.disabled = false
         }
       })
+      const prevPage = document.getElementById('prevPage')
+      if (page === 0) {
+        prevPage.disabled = true
+      } else {
+        prevPage.disabled = false
+      }
+    }
   }, [search])
 
   const handleUpdate = async (event) => {
@@ -98,14 +114,17 @@ export default function List({list, setList, page, setPage, nextbtn}) {
     const data = {
       id: employeeId,
       name: name,
-      age: age,
+      age: parseInt(age),
       email: email,
-      salary: salary,
+      salary: parseInt(salary),
       country: country,
       state: state,
       city: city,
     }
-    const res = await axios.put(`http://localhost:5000/api/employees/put/${page}`, data)
+    const res = await axios.put(
+      `http://localhost:5000/api/employees/put/${page}/${parseInt(pageSize)}`,
+      data
+    )
     if (res.data) {
       await setList(res.data)
     } else {
@@ -152,17 +171,13 @@ export default function List({list, setList, page, setPage, nextbtn}) {
 
   const sortingNum = (column) => {
     if (sort === 'ascending') {
-      const sorted = [...list].sort((a, b) =>
-        a[column] > b[column] ? 1 : -1
-      )
+      const sorted = [...list].sort((a, b) => (a[column] > b[column] ? 1 : -1))
       setList(sorted)
       setSort('descending')
     }
 
     if (sort === 'descending') {
-      const sorted = [...list].sort((a, b) =>
-        a[column] < b[column] ? 1 : -1
-      )
+      const sorted = [...list].sort((a, b) => (a[column] < b[column] ? 1 : -1))
       setList(sorted)
       setSort('ascending')
     }
@@ -188,7 +203,29 @@ export default function List({list, setList, page, setPage, nextbtn}) {
           <thead>
             <tr>
               <th scope='col' className='fs-3 fw-bold'>
-                #
+                <div className='dropdown'>
+                  <button
+                    className='btn btn-secondary btn-sm py-1 px-2 dropdown-toggle'
+                    type='button'
+                    data-bs-toggle='dropdown'
+                  >
+                    Sort
+                    <span className='caret'></span>
+                  </button>
+                  <ul className='dropdown-menu w-25'>
+                    <li onClick={() => setPageSize(3)}>
+                      <a className='text-dark font-weight-light'>3</a>
+                    </li>
+                    <div className='dropdown-divider'></div>
+                    <li onClick={() => setPageSize(5)}>
+                      <a className='text-dark font-weight-light'>5</a>
+                    </li>
+                    <div className='dropdown-divider'></div>
+                    <li onClick={() => setPageSize(10)}>
+                      <a className='text-dark font-weight-light'>10</a>
+                    </li>
+                  </ul>
+                </div>
               </th>
               <th scope='col' className='fs-3 fw-bold' onClick={() => sorting('name')}>
                 Name

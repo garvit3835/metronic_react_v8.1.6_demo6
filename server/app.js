@@ -5,8 +5,8 @@ const updatedb = require("./db/update");
 const readdb = require("./db/read");
 const insertdb = require("./db/insert");
 const deletedb = require("./db/delete");
-const searchdb = require('./db/search')
-// const connectdb = require('./db/connect')
+const searchdb = require("./db/search");
+const authenticatedb = require("./db/authenticate");
 const cors = require("cors");
 
 app.use(cors());
@@ -19,38 +19,63 @@ app.get("/", (req, res) => {
 
 // readdb()
 
-
-app.get("/api/employees/:page", async (req, res) => {
-	const data = await readdb(req.params.page);
+app.get("/api/employees/:page/:pageSize", async (req, res) => {
+	const data = await readdb(req.params.page, req.params.pageSize);
 	res.json(data);
 	// console.log(data)
 });
 
-app.get("/api/employees/search/:searchName", async (req, res) => {
-	const data = await searchdb(req.params.searchName);
-	res.json(data);
+app.post("/api/employees/authenticate", async (req, res) => {
+	const data = await authenticatedb(req.body.email, req.body.password);
+	if (data) {
+		res.json(data);
+	} else {
+		res.json();
+	}
 	// console.log(data)
 });
 
-app.post("/api/employees/insert/:page", async (req, res) => {
-	console.log(req.body)
-	const { name, age, email, salary, country, state, city } = req.body;
-	const insert = await insertdb(name, age, email, salary, country, state, city);
+app.post("/api/employees/search", async (req, res) => {
+	const data = await searchdb(req.body.search);
+
+	res.json(data);
+
+	// console.log(data)
+});
+
+// const show = async () => {
+// 	const data = await searchdb("ar")
+// 	console.log(data)
+// }
+// show()
+
+app.post("/api/employees/insert/:page/:pageSize", async (req, res) => {
+	const { name, age, email, salary, country, state, city, password } = req.body;
+	const insert = await insertdb(
+		name,
+		age,
+		email,
+		salary,
+		country,
+		state,
+		city,
+		password
+	);
 	if (insert) {
-		const data = await readdb(req.params.page);
+		const data = await readdb(req.params.page, req.params.pageSize);
 		res.json(data);
 	} else {
 		res.json();
 	}
 });
 
-app.delete("/api/employees/delete/:id/:page", async (req, res) => {
+app.delete("/api/employees/delete/:id/:page/:pageSize", async (req, res) => {
 	await deletedb(req.params.id);
-	const data = await readdb(req.params.page);
+	const data = await readdb(req.params.page, req.params.pageSize);
 	res.json(data);
 });
 
-app.put("/api/employees/put/:page", async (req, res) => {
+app.put("/api/employees/put/:page/:pageSize", async (req, res) => {
 	const { id, name, age, email, salary, country, state, city } = req.body;
 	const update = await updatedb(
 		id,
@@ -63,7 +88,7 @@ app.put("/api/employees/put/:page", async (req, res) => {
 		city
 	);
 	if (update) {
-		const data = await readdb(req.params.page);
+		const data = await readdb(req.params.page, req.params.pageSize);
 		res.json(data);
 	} else {
 		res.json();

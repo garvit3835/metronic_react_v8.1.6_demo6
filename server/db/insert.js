@@ -1,4 +1,4 @@
-const insertdb = async (name, age, email, salary, country, state, city) => {
+const insertdb = async (name, age, email, salary, country, state, city, password) => {
 	const connect = require("./connect");
 	const collection = await connect();
 	let duplicate = await collection.findOne({ email: email });
@@ -12,6 +12,7 @@ const insertdb = async (name, age, email, salary, country, state, city) => {
 			country: country,
 			state: state,
 			city: city,
+			password: password
 		};
 		await collection.insertOne(myobj);
 		return true;

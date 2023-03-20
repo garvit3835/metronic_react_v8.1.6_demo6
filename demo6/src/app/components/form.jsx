@@ -4,16 +4,18 @@ import axios from 'axios'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-export default function Form({setList, page, setNextbtn}) {
+export default function Form({setList, page, setNextbtn, pageSize}) {
   const [name, setName] = useState('')
-  const [age, setAge] = useState()
+  const [age, setAge] = useState('')
   const [email, setEmail] = useState('')
-  const [salary, setSalary] = useState()
+  const [salary, setSalary] = useState('')
   const [country, setCountry] = useState('')
   const [countryId, setCountryId] = useState()
   const [stateId, setStateId] = useState()
-  const [state, setState] = useState('')
-  const [city, setCity] = useState('')
+  const [state, setState] = useState('-')
+  const [city, setCity] = useState('-')
+  const [password, setPassword] = useState('')
+  
   const countries = Country.getAllCountries()
   let states = []
   if (countryId) {
@@ -29,7 +31,6 @@ export default function Form({setList, page, setNextbtn}) {
     const submit = document.getElementById('submit')
     submit.innerText = 'Submitting...'
     submit.disabled = true
-    console.log(typeof(age))
     let data = {
       name: name,
       age: parseInt(age),
@@ -38,13 +39,36 @@ export default function Form({setList, page, setNextbtn}) {
       country: country,
       state: state,
       city: city,
+      password: password
     }
-    const res = await axios.post(`http://localhost:5000/api/employees/insert/${page}`, data)
+    const res = await axios.post(`http://localhost:5000/api/employees/insert/${page}/${parseInt(pageSize)}`, data)
     if (res.data) {
       await setList(res.data)
       if (res.data.length >= 3) {
         setNextbtn(true)
       }
+      toast.success('Employee Added', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      })
+
+      setAge('')
+      document.getElementById('country').value = '';
+      document.getElementById('state').value = '-';
+      document.getElementById('city').value = '-';
+      setEmail('')
+      setName('')
+      setPassword('')
+      setSalary('')
+      setState('-')
+      setCity('-')
+
     } else {
       toast.error('Enter a unique Email', {
         position: 'top-right',
@@ -76,10 +100,12 @@ export default function Form({setList, page, setNextbtn}) {
 
   return (
     <div>
+      <h1 className='mx-10'>Register new Employee</h1>
       <form onSubmit={handleSubmit}>
         <input
           type='text'
           placeholder='Enter name'
+          value={name}
           onChange={(e) => setName(e.target.value)}
           required
           className='form-control w-25 d-inline m-5 mx-10'
@@ -87,6 +113,7 @@ export default function Form({setList, page, setNextbtn}) {
         <input
           type='number'
           placeholder='Enter age'
+          value={age}
           onChange={(e) => setAge(e.target.value)}
           min={10}
           required
@@ -95,21 +122,32 @@ export default function Form({setList, page, setNextbtn}) {
         <input
           type='email'
           placeholder='Enter email'
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+          className='form-control w-25 d-inline m-5 mx-10'
+        />
+        <input
+          type='password'
+          placeholder='Enter password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
           className='form-control w-25 d-inline m-5 mx-10'
         />
         <input
           type='number'
           placeholder='Enter salary'
+          value={salary}
           onChange={(e) => setSalary(e.target.value)}
           required
           className='form-control w-25 d-inline m-5 mx-10'
         />
 
         <select
+          id='country'
           onChange={handleCountry}
-          defaultValue=''
+          defaultValue={country}
           required
           className='form-control w-25 d-inline m-5 mx-10'
         >
@@ -122,22 +160,26 @@ export default function Form({setList, page, setNextbtn}) {
         </select>
 
         <select
+          id='state'
           onChange={handleState}
-          defaultValue=''
+          defaultValue={state}
+          required
           className='form-control w-25 d-inline m-5 mx-10'
         >
-          <option value='' label='Select State' disabled />
+          <option value='-' label='Select State'/>
           {states.map((state, i) => {
             return <option key={i} value={`${state.name}%${state.isoCode}`} label={state.name} />
           })}
         </select>
 
         <select
+          id='city'
           onChange={(e) => setCity(e.target.value)}
-          defaultValue=''
+          defaultValue={city}
+          required
           className='form-control w-25 d-inline m-5 mx-10'
         >
-          <option value='' label='Select City' disabled />
+          <option value='-' label='Select City'/>
           {cities.map((city, i) => {
             return <option key={i} value={city.name} label={city.name} />
           })}
